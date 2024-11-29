@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import {DateRangeComponent} from "./components/datepicker.tsx";
+import {TableComponent} from "./components/table.tsx";
+import {ConfigProvider, Space, theme} from 'antd';
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    return (
+        <ConfigProvider
+            theme={{
+                "token": {
+                    "colorPrimary": "#8800ff",
+                    "colorInfo": "#8800ff"
+                },
+                algorithm: theme.darkAlgorithm,
+            }}
+        >
+            <Space
+                style={{display: "block"}}>
+                <>
+                    <h1> PT.Central </h1>
+                    <div className="card">
+                        <DateRangeComponent></DateRangeComponent>
+                        <div style={{margin:'20px'}}></div>
+                        <TableComponent></TableComponent>
+                    </div>
+                </>
+            </Space>
+        </ConfigProvider>
+    )
 }
 
 export default App
