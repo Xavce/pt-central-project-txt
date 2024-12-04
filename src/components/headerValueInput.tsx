@@ -32,7 +32,6 @@ export const HeaderValueComponent = ({deleteRow, item, onHeaderChange, onValueCh
                     onChange={(e) => onHeaderChange(e.target.value)} // Call onHeaderChange when header changes
                 />
                 <Input
-                    onKeyDown={(e) => console.log(e)}
                     placeholder="Value"
                     size={"large"}
                     value={item.value} // Set value to value prop
