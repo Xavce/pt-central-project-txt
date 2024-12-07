@@ -5,20 +5,19 @@ const { Search } = Input;
 
 interface InputComponentProps {
     isLoading: boolean;
-    isOption: string; // Include this in props
+    option: string; // Include this in props
     setInputValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const InputComponent : React.FC<InputComponentProps> = ({isOption, isLoading, setInputValue })  => {
+export const InputComponent : React.FC<InputComponentProps> = ({option, isLoading, setInputValue })  => {
 
     const handleOnchange = (e) => {
-        console.log(typeof (isOption));
-        switch (isOption){
-            case "Id":
-                console.log("id")
+        switch (option){
+            case "id":
+                setInputValue(e.target.value)
                 break
 
-            case 'Name':
+            case 'name':
                 setInputValue(e.target.value)
                 break
         }
@@ -30,9 +29,9 @@ export const InputComponent : React.FC<InputComponentProps> = ({isOption, isLoad
                 size={"large"}
                 style={{width:'300px'}}
                 onChange={handleOnchange}
-                placeholder={`Search ${isOption}`}
+                placeholder={`Search ${option}`}
                 loading={isLoading}
-                disabled={!isOption}
+                disabled={!option}
                 enterButton />
         </>
     )

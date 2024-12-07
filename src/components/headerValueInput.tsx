@@ -1,10 +1,10 @@
-import {Button, Input} from "antd";
+import {Button, Input, Select} from "antd";
 import grip from '../assets/grip.svg'
 import { useMotionValue, Reorder } from "framer-motion";
 import { useRaisedShadow } from "./use-raised-shadow.ts";
 
 
-export const HeaderValueComponent = ({deleteRow, item, onHeaderChange, onValueChange }) => {
+export const HeaderValueComponent = ({deleteRow, item, onHeaderChange, onValueChange, onQuoteChage }) => {
     const y = useMotionValue(0);
     const boxShadow = useRaisedShadow(y);
 
@@ -37,26 +37,18 @@ export const HeaderValueComponent = ({deleteRow, item, onHeaderChange, onValueCh
                     value={item.value} // Set value to value prop
                     onChange={(e) => onValueChange(e.target.value)} // Call onValueChange when value changes
                 />
-
+                <Select
+                    defaultValue="none"
+                    style={{ width: 120 }}
+                    size={"large"}
+                    onChange={(e) => onQuoteChage(e)}
+                    options={[
+                        { value: `""`, label: `""` },
+                        { value: 'none', label: `none` },
+                    ]}
+                />
             </Reorder.Item>
         </>
     );
 };
 
-
-interface Props {
-    item: object;
-    index:number;
-}
-
-export const Item = ({ item, index }: Props) => {
-    const y = useMotionValue(0);
-    const boxShadow = useRaisedShadow(y);
-
-    return (
-        <Reorder.Item value={item} id={String(index)} style={{ boxShadow, y }}>
-            <Input></Input>
-            <Input></Input>
-        </Reorder.Item>
-    );
-};

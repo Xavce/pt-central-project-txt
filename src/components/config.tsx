@@ -2,20 +2,23 @@ import { Button, Modal, notification} from 'antd';
 import type { NotificationArgsProps } from 'antd';
 import {useEffect, useState, useMemo, createContext} from "react";
 import { JsonViewerComponent } from "./jsonviewer.tsx";
-import data from '../../dummy/sales_invoice.json';
+import salesInvoicesSample from '../../dummy_data/sales_invoice.json';
+import salesByCustomerSample from '../../dummy_data/sales_by_customer.json';
 import { HeaderValueComponent} from "./headerValueInput.tsx";
 import { Reorder } from "framer-motion";
 import diskIcon from "../assets/disk.svg"
 import gearIcon from "../assets/gear.svg"
 import { v4 as uuidv4} from 'uuid';
-import {ExportToTxt} from "../services/utils.ts"
 import {ExportConfig} from "../types";
 
 type NotificationPlacement = NotificationArgsProps['placement'];
 
 const Context = createContext({ name: 'Default' });
 
-export const ConfigComponent = () => {
+const defaultConfigArray = [{ header: "", value: "", key: uuidv4().toString(), quotation:'' }]
+const defaultConfigObject = { header: "", value: "", key: uuidv4().toString(), quotation:'' }
+
+export const ConfigComponent = ({ placement }: { placement: string }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [api, contextHolder] = notification.useNotification();
 
@@ -31,13 +34,12 @@ export const ConfigComponent = () => {
 
 
     // State to hold an array of objects with 'header' and 'value'
-    const [headerValueConfig, setHeaderValueConfig] = useState<ExportConfig[]>(
-        [{ header: "", value: "", key:uuidv4().toString()}]);
+    const [headerValueConfig, setHeaderValueConfig] = useState<ExportConfig[]>(defaultConfigArray);
 
     const addHeaderValue = () => {
         setHeaderValueConfig([
             ...headerValueConfig,
-            { header: "", value: "", key:uuidv4().toString() }
+           defaultConfigObject
         ]);
     };
 
@@ -51,8 +53,19 @@ export const ConfigComponent = () => {
     const saveConfiguration = () => {
         const config = JSON.stringify(headerValueConfig);
 
-        localStorage.setItem("export-configuration", config);
+        switch (placement){
+            case 'sales_invoices':
+                localStorage.setItem("export-configuration-sales_invoices", config);
+                break
+            case 'sales_by_customer':
+                localStorage.setItem("export-configuration-sales_by_customer", config);
+                break
+            default: localStorage.setItem("export-configuration", config);
+
+        }
+
         openNotification('topRight')
+        setIsModalOpen(false)
     }
 
     const deleteRowConfig = (key:number) =>{
@@ -61,10 +74,24 @@ export const ConfigComponent = () => {
     }
 
     useEffect(() => {
-        const config:string = localStorage.getItem("export-configuration");
-        console.log(ExportToTxt.export())
-        setHeaderValueConfig(JSON.parse(config))
-    }, []);
+        console.log(placement);
+        try {
+            const config = localStorage.getItem(`export-configuration-${placement}`);
+            if (config) {
+                setHeaderValueConfig(JSON.parse(config));
+            } else {
+                // If no config is found, set an empty or default configuration
+                setHeaderValueConfig(defaultConfigArray);
+            }
+        } catch (e) {
+            setHeaderValueConfig(defaultConfigArray);
+        }
+    }, [placement]);
+
+    useEffect(() => {
+        console.log(headerValueConfig)
+    }, [headerValueConfig]);
+
 
     return (
         <Context.Provider value={contextValue}>
@@ -100,7 +127,9 @@ export const ConfigComponent = () => {
                 <div style={{display: 'flex', justifyContent: 'space-between', gap: '15px', alignItems: "flex-start"}}>
                     <div style={{height: '50vh', overflowY: 'scroll'}}>
                         <h1>Sample Data</h1>
-                        <JsonViewerComponent jsonData={data.sales_invoices[0]}/>
+                        <JsonViewerComponent jsonData={placement == 'sales_invoices'
+                            ? salesInvoicesSample.sales_invoices[0]
+                            : salesByCustomerSample.sales_by_customers.report[0]}/>
                     </div>
                     <div style={{display: 'flex', flexDirection: 'column', height: '50vh', overflowY: 'scroll' }}>
                         {
@@ -115,6 +144,7 @@ export const ConfigComponent = () => {
                                         key={item.key}
                                         deleteRow={deleteRowConfig}
                                         item={item}
+                                        onQuoteChage={(newQuotation: string) => updateHeaderValue(index, 'quotation', newQuotation)}
                                         onHeaderChange={(newHeader: string) => updateHeaderValue(index, 'header', newHeader)}
                                         onValueChange={(newValue: string) => updateHeaderValue(index, 'value', newValue)}/>
                                 ))}
