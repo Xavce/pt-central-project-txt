@@ -13,11 +13,12 @@ export const SelectRadioComponent:React.FC<SelectRadioProps> = ({placement, setP
         <>
             <Radio.Group
                 value={placement}
+                defaultValue={"sales_invoices"}
                 size={"large"}
                 onChange={(e) => setPlacement(e.target.value)}
             >
-                <Radio.Button value="invoices">Invoices</Radio.Button>
-                <Radio.Button value="customers">Customers</Radio.Button>
+                <Radio.Button value="sales_invoices">Sales Invoices</Radio.Button>
+                <Radio.Button value="sales_by_customer">Sales By Customer</Radio.Button>
             </Radio.Group>
         </>
     )
@@ -25,18 +26,19 @@ export const SelectRadioComponent:React.FC<SelectRadioProps> = ({placement, setP
 }
 
 interface SelectOptionGroupProps {
-    isOption: string; // Include this in props
-    setIsOption: React.Dispatch<React.SetStateAction<string>>;
+    option: string; // Include this in props
+    setOption: React.Dispatch<React.SetStateAction<string>>;
     placement: string;
 }
 
-export const SelectOptionGroupComponent:React.FC<SelectOptionGroupProps> = ({placement, isOption, setIsOption}) => {
+export const SelectOptionGroupComponent:React.FC<SelectOptionGroupProps> = ({placement, option, setOption}) => {
+
     return(
         <Select
-            defaultValue={isOption}
+            defaultValue={option}
             style={{ width: 100 }}
             onChange={(e) => {
-                e ? setIsOption(e) : setIsOption('');
+                e ? setOption(e) : setOption('');
             }}
             size={"large"}
             options={[
@@ -44,8 +46,8 @@ export const SelectOptionGroupComponent:React.FC<SelectOptionGroupProps> = ({pla
                     label: <span>{placement}</span>,
                     title: 'Invoices',
                     options: [
-                        { label: <span>Id</span>, value: 'Id' },
-                        { label: <span>Name</span>, value: 'Name' },
+                        { label: <span>Id</span>, value: 'id' },
+                        { label: <span>Name</span>, value: 'name' },
                     ],
                 },
             ]}
