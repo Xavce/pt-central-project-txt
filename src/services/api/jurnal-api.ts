@@ -1,44 +1,45 @@
-// import axios from "axios";
-//
-//
-// const fetchApi = async (endpoint: string) => {
-//     try {
-//         const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
-//
-//         const response = await fetch(url, {
-//
-//             headers: {
-//                 'Authorization': `Bearer ${import.meta.env.VITE_API_KEY}`,
-//                 'Content-Type': 'application/json'
-//             },
-//         }).then(response => response.json()).then((r) => console.log(r))
-//
-//         return response; // Return only the response data if that's all you need
-//     } catch (error) {
-//         console.error('API Fetch Error:', error);
-//         throw error; // Propagate the error for the caller to handle
-//     }
-// };
-
+import {SalesInvoicesParamsType,SalesByCustomersParamsType, SearchInvoiceorCustomerByIdType} from "../../types";
 
 export class Invoice{
-    // static getSalesInvoice = async(params: salesInvoiceType) => {
-    //     const endpoint:string = ""
-    //
-    // }
+    static getSalesInvoices = async (paramsInput: SalesInvoicesParamsType) => {
+        const params:string = new URLSearchParams(paramsInput as any).toString();
 
-    static getInvoiceById = async(id: number) => {
-        const url = `/api/v1/sales_invoices/${id}`;
+        const endpoint:string = `${import.meta.env.VITE_API_URL}/sales_invoices/?${params}&access_token=${import.meta.env.VITE_API_KEY}`;
 
+        console.log(endpoint);
+        try {
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Failed to fetch sales invoice:', error);
+            throw error;
+        }
+    };
+
+
+    static getInvoiceById = async(id: SearchInvoiceorCustomerByIdType) => {
+        const endpoint:string = `${import.meta.env.VITE_API_URL}/sales_invoices/${id}?access_token=${import.meta.env.VITE_API_KEY}`;
 
         try {
-            const response = await fetch(url + `?access_token=${import.meta.env.VITE_API_KEY}`)
-                .then(response => response.json())
-                .then((c) => {
-                    return (c)
-                })
+            const response = await fetch(endpoint)
 
-            return response; // Return only the response data if that's all you need
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data;
         } catch (error) {
             console.error('API Fetch Error:', error);
             throw error; // Propagate the error for the caller to handle
@@ -46,27 +47,56 @@ export class Invoice{
     }
 }
 
-//
-// export class Customer{
-//     static getCustomerLists = async() => {
-//         const endpoint:string = ""
-//
-//     }
-//
-//     static getCustomerById = async() => {
-//         const endpoint:string = ""
-//
-//     }
-//
-//     static getSalesByCustomers = (page_size: number, end_date: string, start_date:string) => {
-//         const endpoint:string = ""
-//
-//     }
-//
-// }
-//
-//
-// Invoice.getInvoiceById(24218).then((res) => console.log(res))
+export class Customer{
+    static getCustomerInvoices = async(paramsInput:SalesByCustomersParamsType) => {
+        const params:string = new URLSearchParams(paramsInput as any).toString();
+
+        const endpoint:string = `${import.meta.env.VITE_API_URL}/sales_by_customers/?${params}&access_token=${import.meta.env.VITE_API_KEY}`;
+
+        try{
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if(!response.ok) {
+                throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data;
+        }catch(error){
+            console.error('Failed to fetch sales invoice:', error);
+            throw error;
+        }
+    }
+
+    static getCustomerById = async(id:SearchInvoiceorCustomerByIdType) => {
+        const endpoint:string = `${import.meta.env.VITE_API_URL}/sales_by_customers/${id}?access_token=${import.meta.env.VITE_API_KEY}`;
+
+        try{
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if(!response.ok) {
+                throw new Error(`Error: ${response.status} - ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            return data;
+        }catch(error){
+            console.error('Failed to fetch sales invoice:', error);
+            throw error;
+        }
+    }
+}
 
 
-console.log(import.meta.env.VITE_API_KEY)
+
+
