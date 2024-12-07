@@ -5,9 +5,12 @@ import { Button, Modal, theme, Popover } from 'antd';
 import downloadFileIcon from '../assets/download-file.svg'
 import eyeIcon from '../assets/eye.svg'
 import infoIcon from '../assets/information.svg'
-import data from "../../dummy/sales_invoice.json"
-import {Parse, Calculate} from "../services/utils.ts"
+import data from "../../dummy_data/sales_invoice.json"
+import {Parse, Calculate, ExportToTxt} from "../services/utils.ts"
 import {JsonViewerComponent} from "./jsonviewer.tsx";
+import TxtViewer from "./txtViewer.tsx";
+import {DataType} from "../types";
+
 
 const {useToken} = theme
 
@@ -15,130 +18,216 @@ interface InputComponentProps {
     isLoading: boolean;
     inputValue: string
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setPageSize: React.Dispatch<React.SetStateAction<number>>;
+    setPage: React.Dispatch<React.SetStateAction<number>>;
+    setInputValue: React.Dispatch<React.SetStateAction<string>>;
+    dataSource: object[]
+    pageSize: number
+    pageLength: number
+    placement: string
+    option: string
 }
 
-export const TableComponent : React.FC<InputComponentProps> = ({ inputValue, isLoading, setIsLoading }) => {
+export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, option, placement, pageLength, dataSource, inputValue, isLoading, setIsLoading, setPageSize, pageSize, setPage }) => {
     const { token } = useToken();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [dataSource, setDataSource] = useState<DataType[]>([]);
-    const [filteredDataSource, setFilteredDataSource] = useState<DataType[]>([]);
+    const [filteredDataSource, setFilteredDataSource] = useState([]);
     const [selectedRowData, setSelectedRowData] = useState({});
+    const [detailedRowData, setDetailedRowData] = useState({})
 
+    let columns: TableColumnsType<DataType> = [];
 
-    interface DataType {
-        name: string;
-        total: number;
-        transaction_no: number;
-        detail_data: object;
+    switch (placement){
+        case 'sales_invoices':
+            columns = [
+                {
+                    title: 'Display Name',
+                    width: 50,
+                    dataIndex: 'name',
+                    key: 'name',
+                    fixed: 'left',
+                    sorter: (a, b) => a.name.localeCompare(b.name),
+                    sortDirections: ["ascend",'descend'],
+                },
+                {
+                    title: 'Total',
+                    width: 50,
+                    dataIndex: "total",
+                    key: 'total',
+                    fixed: 'left',
+                    sorter: (a, b) => a.total - b.total,
+                    render: (value:string) => Parse.numberToCurrency(value),
+                    sortDirections: ["ascend",'descend'],
+                },
+                {
+                    title: 'Transaction No.',
+                    dataIndex: 'id',
+                    key: '1',
+                    sorter: (a, b) => a.id - b.id,
+                    width: 50,
+                },
+                {
+                    title: 'Action',
+                    key: 'operation',
+                    fixed: 'right',
+                    width: 20,
+                    render: (_,record) =>
+                        <div style={{ display: 'flex', gap: '10px', justifyContent:'right' }}>
+                            <Popover
+                                title={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
+                                        <span>Preview Invoice</span>
+                                    </div>
+                                }
+                                trigger="hover"
+                                placement="bottomRight">
+                                <Button
+                                    color="primary"
+                                    variant="outlined"
+                                    icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
+                                    onClick={() => {
+                                        setSelectedRowData(record)
+                                        setIsModalOpen(true)
+                                    }}
+                                />
+                            </Popover>
+                            <Popover
+                                title={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
+                                        <span>Export to TXT</span>
+                                    </div>
+                                }
+                                trigger="hover" placement="bottomRight">
+                                <Button
+                                    style={{
+                                        color:token.colorPrimary
+                                    }}
+                                    color="primary"
+                                    variant="solid"
+                                    icon={<img src={downloadFileIcon} alt="Download Icon" style={{ width: 16, height: 16 }} />}
+                                    onClick={() => ExportToTxt.export(placement, _['detail_data'], {header: true, download:true})}
+                                />
+                            </Popover>
+                        </div>
+                },
+            ];
+            break
+
+        case 'sales_by_customer':
+            columns = [
+                {
+                    title: 'Display Name',
+                    width: 50,
+                    dataIndex: 'name',
+                    key: 'name',
+                    fixed: 'left',
+                    sorter: (a, b) => a.name.localeCompare(b.name),
+                    sortDirections: ["ascend",'descend'],
+                },
+                {
+                    title: 'Total',
+                    width: 50,
+                    dataIndex: 'total',
+                    key: 'total',
+                    fixed: 'left',
+                    sorter: (a, b) => a.total - b.total,
+                    render: (value:string | number) => Parse.numberToCurrency(value),
+                    sortDirections: ["ascend",'descend'],
+                },
+                {
+                    title: 'Customer Id',
+                    dataIndex: 'id',
+                    key: '1',
+                    sorter: (a, b) => a.id - b.id,
+                    width: 50,
+                },
+                {
+                    title: 'Action',
+                    key: 'operation',
+                    fixed: 'right',
+                    width: 20,
+                    render: (_,record) =>
+                        <div style={{ display: 'flex', gap: '10px', justifyContent:'right' }}>
+                            <Popover
+                                title={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
+                                        <span>Preview Invoice</span>
+                                    </div>
+                                }
+                                trigger="hover"
+                                placement="bottomRight">
+                                <Button
+                                    color="primary"
+                                    variant="outlined"
+                                    icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
+                                    onClick={() => {
+                                        setSelectedRowData(record)
+                                        setIsModalOpen(true)
+                                    }}
+                                />
+                            </Popover>
+                            <Popover
+                                title={
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
+                                        <span>Export to TXT</span>
+                                    </div>
+                                }
+                                trigger="hover" placement="bottomRight">
+                                <Button
+                                    style={{
+                                        color:token.colorPrimary
+                                    }}
+                                    color="primary"
+                                    variant="solid"
+                                    icon={<img src={downloadFileIcon} alt="Download Icon" style={{ width: 16, height: 16 }} />}
+                                    onClick={() => ExportToTxt.export(placement, _['detail_data'], {header: true, download:true})}
+                                />
+                            </Popover>
+                        </div>
+                },
+            ];
+            break
     }
 
-    const columns: TableColumnsType<DataType> = [
-        {
-            title: 'Display Name',
-            width: 50,
-            dataIndex: 'name',
-            key: 'name',
-            fixed: 'left',
-            sorter: (a, b) => a.name.localeCompare(b.name),
-            sortDirections: ["ascend",'descend'],
-        },
-        {
-            title: 'Total',
-            width: 50,
-            dataIndex: 'total',
-            key: 'total',
-            fixed: 'left',
-            sorter: (a, b) => a.total - b.total,
-            render: (value:number) => Parse.numberToCurrency(value),
-            sortDirections: ["ascend",'descend'],
-        },
-        {
-            title: 'Transaction No.',
-            dataIndex: 'transaction_no',
-            key: '1',
-            sorter: (a, b) => a.transaction_no - b.transaction_no,
-            width: 50,
-        },
-        {
-            title: 'Action',
-            key: 'operation',
-            fixed: 'right',
-            width: 20,
-            render: (_,record) =>
-                <div style={{ display: 'flex', gap: '10px', justifyContent:'right' }}>
-                    <Popover
-                        title={
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
-                                <span>Preview Invoice</span>
-                            </div>
-                        }
-                        trigger="hover"
-                        placement="bottomRight">
-                        <Button
-                            color="primary"
-                            variant="outlined"
-                            icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
-                            onClick={() => {
-                                console.log(_['detailed_data'])
-                                setSelectedRowData(record)
-                                setIsModalOpen(true)
-                            }}
-                        />
-                    </Popover>
-                    <Popover
-                        title={
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
-                                <span>Export to TXT</span>
-                            </div>
-                        }
-                        trigger="hover" placement="bottomRight">
-                        <Button
-                            style={{
-                                color:token.colorPrimary
-                            }}
-                            color="primary"
-                            variant="solid"
-                            icon={<img src={downloadFileIcon} alt="Download Icon" style={{ width: 16, height: 16 }} />}
-                        />
-                    </Popover>
-                </div>
-        },
-    ];
-
-
-    const getDataSource = () => {
-        return data["sales_invoices"].map<DataType>((i) => ({
-            key: i['id'],
-            name: i['person']['display_name'], // Dynamic name
-            total: Parse.currencyStringToNumber(i['original_amount_currency_format']), // Static value
-            transaction_no: i['id'], // Dynamic transaction number
-            detail_data: i
-        }))
-
-    };
-
-    const handleInputChange =  (searchTerm: string) => {
+    const handleInputChange = (searchTerm: string) => {
         if (searchTerm !== '') {
-            const filteredItems = dataSource.filter((data) =>
-                data.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredDataSource(filteredItems);
+            if (option === 'name') {
+                const filteredItems = dataSource.filter((data) =>
+                    String(data['name']).toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                setFilteredDataSource(filteredItems);
+
+            } else if (option === 'id') {
+                const filteredItems = dataSource.filter((data) =>
+                    String(data['id']).toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                setFilteredDataSource(filteredItems);
+            }
         } else {
             setFilteredDataSource([]);
         }
     };
 
     useEffect(() => {
-        if (inputValue !== '') {
-            handleInputChange(inputValue);
-        } else {
-            setDataSource(getDataSource());
-        }
-
+        handleInputChange(inputValue);
     }, [inputValue]);
 
+    useEffect(() => {
+        const exportedText = ExportToTxt.export(placement, selectedRowData['detail_data'], {
+            header: true,
+            download: false
+        });
+
+        setDetailedRowData(exportedText)
+    }, [selectedRowData]);
+
+    useEffect(() => {
+        setInputValue('')
+    }, [option, placement])
 
     return (
         <>
@@ -146,9 +235,13 @@ export const TableComponent : React.FC<InputComponentProps> = ({ inputValue, isL
                 loading={isLoading}
                 columns={columns}
                 pagination={{
+                    defaultPageSize:pageSize,
                     showSizeChanger:true,
-                    total: inputValue != '' ? filteredDataSource.length: dataSource.length,
-                    onChange: (page, pageSize) => console.log(page, pageSize)
+                    total: pageLength,
+                    onChange: (page, pageSize) => {
+                        setPage(page)
+                        setPageSize(pageSize)
+                    }
                 }}
                 dataSource={inputValue != '' ? filteredDataSource: dataSource}
                 scroll={{x: 500}}
@@ -170,6 +263,8 @@ export const TableComponent : React.FC<InputComponentProps> = ({ inputValue, isL
                             </Table.Summary.Cell>
                             <Table.Summary.Cell index={3} align={'right'}>
                                 <Button
+                                    onClick={() =>
+                                        ExportToTxt.export(placement, dataSource, {header: true, download: true})}
                                     color="primary"
                                     variant="solid">
                                     Export all
@@ -187,7 +282,8 @@ export const TableComponent : React.FC<InputComponentProps> = ({ inputValue, isL
                 open={isModalOpen}
                 onOk={() => setIsModalOpen(false)}
                 onCancel={() => setIsModalOpen(false)}
-                width={1000}
+                style={{padding: '50px 0'}}
+                width={800}
                 footer={[
                     <Button
                         style={{position: "sticky"}}
@@ -197,8 +293,11 @@ export const TableComponent : React.FC<InputComponentProps> = ({ inputValue, isL
                     </Button>,
                 ]}
             >
-                <JsonViewerComponent
-                    jsonData={selectedRowData}/>
+                <div style={{display: 'flex'}}>
+                    <JsonViewerComponent
+                        jsonData={selectedRowData}/>
+                    <TxtViewer textString={detailedRowData}></TxtViewer>
+                </div>
             </Modal>
         </>
 

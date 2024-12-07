@@ -1,29 +1,27 @@
-import {DatePicker, Button} from 'antd';
-import {useState} from 'react';
+import {DatePicker} from 'antd';
 import type { Dayjs } from 'dayjs';
 import type { NoUndefinedRangeValueType } from 'rc-picker/lib/PickerInput/RangePicker';
+import {Calculate} from "../services/utils.ts";
 
 const {RangePicker} = DatePicker;
 
 interface InputComponentProps {
-    isLoading: boolean;
+    setDateRange: React.Dispatch<React.SetStateAction<string[]>>;
 }
-export const DateRangeComponent:  React.FC<InputComponentProps> = ({ isLoading }) => {
-    const [dateStr, setDateStr] = useState<string[] | null>(null);
+export const DateRangeComponent:  React.FC<InputComponentProps> = ({setDateRange }) => {
 
     function onSelectDate(dates: NoUndefinedRangeValueType<Dayjs> | null, dateString: [string, string]) {
-        setDateStr(dateString);
-        console.log('Selected Date Range:', dateString);
+        setDateRange(dateString);
     }
 
     return (
         <div style={{display:'inline-flex', gap: '10px'}}>
             <RangePicker
                 size={"large"}
+                defaultValue={Calculate.dayJsDate(1)}
                 placement="topLeft"
                 onChange={onSelectDate}
             />
-            <Button size={"large"} loading={isLoading}>Search</Button>
         </div>
     );
 };
