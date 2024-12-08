@@ -27,13 +27,12 @@ Digunakan untuk memilih rentang waktu data yang akan diambil.
 ![Date](https://github.com/user-attachments/assets/23280af7-4b18-4f6b-990f-7645e3902365)
 
 ### 2. **Sales Features**
+  ![Sales By Customer](https://github.com/user-attachments/assets/fbd09553-2ab8-4898-b638-23caf62875f4)
+
 - **Sales Invoices**  
-  Menampilkan ringkasan data invoice penjualan berdasarkan rentang waktu.  
-  ![Sales Invoices](https://github.com/user-attachments/assets/fbd09553-2ab8-4898-b638-23caf62875f4)
-  
+  Menampilkan ringkasan data invoice penjualan berdasarkan rentang waktu.    
 - **Sales By Customer**  
   Menampilkan ringkasan data penjualan per pelanggan berdasarkan rentang waktu.  
-  ![Sales By Customer](https://github.com/user-attachments/assets/fbd09553-2ab8-4898-b638-23caf62875f4)
 
 ### 3. **Search Name/ID**
 Mencari nama atau ID tertentu (Invoice atau Customer) di dalam tabel.  
