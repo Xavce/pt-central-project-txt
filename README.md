@@ -66,19 +66,19 @@ Menampilkan data dalam dua format:
 Mengatur kolom data yang akan dimasukkan ke dalam file `.txt`.  
 ![Export Config](https://github.com/user-attachments/assets/ae011219-e3b6-4f83-8298-97e97d6d0942)
 ![image](https://github.com/user-attachments/assets/84831dc5-2b8e-4086-8105-b0f3317c0ee6)
-    Terdapat beberapa bagian dalam halaman konfigurasi tersebut:
-    - Kolom merah = Bertujuan untuk menunjukkan contoh/sample data, yang kemudian akan digunakan untuk menginput value. (Note: Ini hanya data acuan untuk menginput value, setiap data pada table tidak sama persis!)
-    - Kolom biru/header = Bertujuan untuk menamakan header dalam hasil export. (Bebas dalam penggunaan nama)
-    - Kolom kuning/value = Bertujuan untuk menginput data apa saja dalam sales invoice atau sales by customer, yang kemudian akan mengasihkan value/nilai yang terdapat pada json di kolom merah.
-    ![image](https://github.com/user-attachments/assets/dca55335-8dee-4315-afaa-752df3ed346f)
-    Contohnya Pada bagian Sumber Data, setiap nama seperti person.display_name atau sales_deliveries.0.id menunjukkan lokasi data dalam sistem. Titik (.) digunakan untuk masuk lebih dalam ke bagian tertentu dari data, seperti membuka folder dalam folder. Misalnya, person.display_name berarti mengambil nama yang ditampilkan dari bagian "person".
-
+**Terdapat beberapa bagian dalam halaman konfigurasi tersebut:**
+- Kolom merah = Bertujuan untuk menunjukkan contoh/sample data, yang kemudian akan digunakan untuk menginput value. (Note: Ini hanya data acuan untuk menginput value, setiap data pada table tidak sama persis!)
+- Kolom biru/header = Bertujuan untuk menamakan header dalam hasil export. (Bebas dalam penggunaan nama)
+- Kolom kuning/value = Bertujuan untuk menginput data apa saja dalam sales invoice atau sales by customer, yang kemudian akan mengasihkan value/nilai yang terdapat pada json di kolom merah.
+  ![image](https://github.com/user-attachments/assets/dca55335-8dee-4315-afaa-752df3ed346f)
+  Contohnya Pada bagian Sumber Data, setiap nama seperti person.display_name atau sales_deliveries.0.id menunjukkan lokasi data dalam sistem. Titik (.) digunakan untuk masuk lebih dalam ke bagian tertentu dari data, seperti membuka folder dalam folder. Misalnya, person.display_name berarti mengambil nama yang ditampilkan dari bagian "person".
 Indeks (0, 1, dll.) digunakan untuk memilih item tertentu dari daftar. Sebagai contoh, sales_deliveries.0.id berarti mengambil ID dari pengiriman pertama (karena komputer menghitung mulai dari 0).
-    - Kolom ungu/quotation = Bertujuan untuk merubah data hasil value menjadi sebuah string. Berguna saat menemukan nilai yang mengandung koma(,). 
-    Perbedaan jika menggunakan quotation dan tidak menggunakan quotation 👇
-    ![image](https://github.com/user-attachments/assets/a3ffcdb8-f420-49fd-8ad7-078c394a1c59)
-    - Kolom hijau/new row = Bertujuan untuk menambahkan row pada konfigurasi.
-    Note: Jangan lupa untuk "Save"
+- Kolom ungu/quotation = Bertujuan untuk merubah data hasil value menjadi sebuah string. Berguna saat menemukan nilai yang mengandung koma(,). 
+  Perbedaan jika menggunakan quotation dan tidak menggunakan quotation 👇
+  ![image](https://github.com/user-attachments/assets/a3ffcdb8-f420-49fd-8ad7-078c394a1c59)
+- Kolom hijau/new row = Bertujuan untuk menambahkan row pada konfigurasi.
+
+  Note: Jangan lupa untuk "Save"
 ---
 
 ## 📋 Panduan Singkat
