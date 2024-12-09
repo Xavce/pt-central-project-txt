@@ -6,7 +6,6 @@ export class Invoice{
 
         const endpoint:string = `${import.meta.env.VITE_API_URL}/sales_invoices/?${params}&access_token=${import.meta.env.VITE_API_KEY}`;
 
-        console.log(endpoint);
         try {
             const response = await fetch(endpoint, {
                 method: 'GET',

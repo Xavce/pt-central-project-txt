@@ -74,7 +74,6 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
     }
 
     useEffect(() => {
-        console.log(placement);
         try {
             const config = localStorage.getItem(`export-configuration-${placement}`);
             if (config) {
@@ -88,9 +87,6 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
         }
     }, [placement]);
 
-    useEffect(() => {
-        console.log(headerValueConfig)
-    }, [headerValueConfig]);
 
 
     return (
