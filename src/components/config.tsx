@@ -10,6 +10,7 @@ import diskIcon from "../assets/disk.svg"
 import gearIcon from "../assets/gear.svg"
 import { v4 as uuidv4} from 'uuid';
 import {ExportConfig} from "../types";
+import {Parse} from "../services/utils.ts";
 
 type NotificationPlacement = NotificationArgsProps['placement'];
 
@@ -37,11 +38,13 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
     const [headerValueConfig, setHeaderValueConfig] = useState<ExportConfig[]>(defaultConfigArray);
 
     const addHeaderValue = () => {
-        setHeaderValueConfig([
-            ...headerValueConfig,
-           defaultConfigObject
-        ]);
+        const newConfig = { ...defaultConfigObject, key: uuidv4() };
+        const isDuplicate = headerValueConfig.some(item => item.key === newConfig.key);
+        if (!isDuplicate) {
+            setHeaderValueConfig([...headerValueConfig, newConfig]);
+        }
     };
+
 
     const updateHeaderValue = (index: number, field: string, newValue: string) => {
         // Update the header or value of the component at the given index
@@ -49,9 +52,10 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
         updatedComponents[index][field] = newValue;
         setHeaderValueConfig(updatedComponents);
     };
-    
+
     const saveConfiguration = () => {
         const config = JSON.stringify(headerValueConfig);
+        console.log(config)
 
         switch (placement){
             case 'sales_invoices':
@@ -87,12 +91,17 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
         }
     }, [placement]);
 
-
+    useEffect(() => {
+        const config = localStorage.getItem(`export-configuration-${placement}`);
+        const parsedConfig = JSON.parse(config)
+        setHeaderValueConfig(parsedConfig)
+    }, [isModalOpen]);
 
     return (
         <Context.Provider value={contextValue}>
             {contextHolder}
             <Button
+                disabled={true}
                 color="primary"
                 size={"large"}
                 onClick={() => setIsModalOpen(true)}
@@ -135,7 +144,9 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
                                 axis="y"
                                 onReorder={setHeaderValueConfig}
                                 values={headerValueConfig}>
-                                {headerValueConfig.map((item, index) => (
+                                {
+                                    headerValueConfig &&
+                                    headerValueConfig.map((item, index) => (
                                     <HeaderValueComponent
                                         key={item.key}
                                         deleteRow={deleteRowConfig}

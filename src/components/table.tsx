@@ -143,52 +143,6 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                     sorter: (a, b) => a.id - b.id,
                     width: 50,
                 },
-                {
-                    title: 'Action',
-                    key: 'operation',
-                    fixed: 'right',
-                    width: 20,
-                    render: (_,record) =>
-                        <div style={{ display: 'flex', gap: '10px', justifyContent:'right' }}>
-                            <Popover
-                                title={
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
-                                        <span>Preview Invoice</span>
-                                    </div>
-                                }
-                                trigger="hover"
-                                placement="bottomRight">
-                                <Button
-                                    color="primary"
-                                    variant="outlined"
-                                    icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
-                                    onClick={() => {
-                                        setSelectedRowData(record)
-                                        setIsModalOpen(true)
-                                    }}
-                                />
-                            </Popover>
-                            <Popover
-                                title={
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
-                                        <span>Export to TXT</span>
-                                    </div>
-                                }
-                                trigger="hover" placement="bottomRight">
-                                <Button
-                                    style={{
-                                        color:token.colorPrimary
-                                    }}
-                                    color="primary"
-                                    variant="solid"
-                                    icon={<img src={downloadFileIcon} alt="Download Icon" style={{ width: 16, height: 16 }} />}
-                                    onClick={() => ExportToTxt.export(placement, _['detail_data'], {header: true, download:true})}
-                                />
-                            </Popover>
-                        </div>
-                },
             ];
             break
     }
@@ -229,6 +183,15 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
         setInputValue('')
     }, [option, placement])
 
+    const ds:DataType[] = data.sales_invoices.map<DataType>((item, index) => ({
+        id: item.transaction_no,
+        name: item.person.display_name,
+        total: Parse.currencyStringToNumber(item.original_amount_currency_format),
+        key: item.id || index, // Use a unique field or fallback to the index
+        detail_data: {...item}
+    }));
+
+
     return (
         <>
             <Table<DataType>
@@ -262,13 +225,17 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                 </b>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell index={3} align={'right'}>
-                                <Button
-                                    onClick={() =>
-                                        ExportToTxt.export(placement, dataSource, {header: true, download: true})}
-                                    color="primary"
-                                    variant="solid">
-                                    Export all
-                                </Button>
+                                {
+                                    placement == "sales_invoices" &&
+                                        <Button
+                                            onClick={() =>
+                                                ExportToTxt.export(placement, dataSource, {header: true, download: true})}
+                                            color="primary"
+                                            variant="solid">
+                                            Export all
+                                        </Button>
+                                }
+
                             </Table.Summary.Cell>
                         </Table.Summary.Row>
                     </Table.Summary>

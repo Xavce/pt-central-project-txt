@@ -41,6 +41,7 @@ export const HeaderValueComponent = ({deleteRow, item, onHeaderChange, onValueCh
                     defaultValue="none"
                     style={{ width: 120 }}
                     size={"large"}
+                    value={item.quotation} // Set value to value prop
                     onChange={(e) => onQuoteChage(e)}
                     options={[
                         { value: `""`, label: `""` },
