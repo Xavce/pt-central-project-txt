@@ -91,12 +91,6 @@ export const ConfigComponent = ({ placement }: { placement: string }) => {
         }
     }, [placement]);
 
-    useEffect(() => {
-        const config = localStorage.getItem(`export-configuration-${placement}`);
-        const parsedConfig = JSON.parse(config)
-        setHeaderValueConfig(parsedConfig)
-    }, [isModalOpen]);
-
     return (
         <Context.Provider value={contextValue}>
             {contextHolder}
