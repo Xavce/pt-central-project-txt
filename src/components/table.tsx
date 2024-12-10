@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import { Table } from 'antd';
+import {Input, Table} from 'antd';
 import type { TableColumnsType } from 'antd';
 import { Button, Modal, theme, Popover } from 'antd';
 import downloadFileIcon from '../assets/download-file.svg'
 import eyeIcon from '../assets/eye.svg'
 import infoIcon from '../assets/information.svg'
-import data from "../../dummy_data/sales_invoice.json"
 import {Parse, Calculate, ExportToTxt} from "../services/utils.ts"
 import {JsonViewerComponent} from "./jsonviewer.tsx";
 import TxtViewer from "./txtViewer.tsx";
@@ -37,6 +36,21 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
 
     let columns: TableColumnsType<DataType> = [];
 
+    const updateFakturNumToLocal = (id, nomor_faktur) => {
+        let list_nomor_faktur = JSON.parse(localStorage.getItem("list_nomor_faktur")) || {};
+
+        // Update the invoice number in the local storage object
+        list_nomor_faktur[id] = nomor_faktur;
+        localStorage.setItem("list_nomor_faktur", JSON.stringify(list_nomor_faktur));
+    };
+
+    const getFakturNumFromLocal = (id) => {
+        const list_nomor_faktur = JSON.parse(localStorage.getItem("list_nomor_faktur")) || {};
+
+        // Return the invoice number or an empty string if it doesn't exist
+        return list_nomor_faktur[id] || '';
+    };
+
     switch (placement){
         case 'sales_invoices':
             columns = [
@@ -67,6 +81,29 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                     width: 50,
                 },
                 {
+                    title:'Nomor Faktur',
+                    key:'no_faktur',
+                    width:50,
+                    render: (_, record) =>
+                        <Popover
+                            title={
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
+                                    <span>Export to TXT</span>
+                                </div>
+                            }
+                            trigger="hover" placement="bottomRight">
+                            <Input
+                                placeholder="Nomor Faktur"
+                                defaultValue={getFakturNumFromLocal(_['id'])}
+                                onChange={(e) => {
+                                    const newValue = e.target.value;
+                                    updateFakturNumToLocal(_['id'], newValue);
+                                }}
+                            />
+                        </Popover>
+                },
+                {
                     title: 'Action',
                     key: 'operation',
                     fixed: 'right',
@@ -87,7 +124,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                     variant="outlined"
                                     icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
                                     onClick={() => {
-                                        setSelectedRowData(record)
+                                        setSelectedRowData(_)
                                         setIsModalOpen(true)
                                     }}
                                 />
@@ -107,7 +144,9 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                     color="primary"
                                     variant="solid"
                                     icon={<img src={downloadFileIcon} alt="Download Icon" style={{ width: 16, height: 16 }} />}
-                                    onClick={() => ExportToTxt.export(placement, _['detail_data'], {header: true, download:true})}
+                                    onClick={() => {ExportToTxt.export(placement, _, {
+                                        header: true,
+                                        download: true})}}
                                 />
                             </Popover>
                         </div>
@@ -166,12 +205,13 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
         }
     };
 
+
     useEffect(() => {
         handleInputChange(inputValue);
     }, [inputValue]);
 
     useEffect(() => {
-        const exportedText = ExportToTxt.export(placement, selectedRowData['detail_data'], {
+        const exportedText = ExportToTxt.export(placement, selectedRowData, {
             header: true,
             download: false
         });
@@ -182,14 +222,6 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
     useEffect(() => {
         setInputValue('')
     }, [option, placement])
-
-    const ds:DataType[] = data.sales_invoices.map<DataType>((item, index) => ({
-        id: item.transaction_no,
-        name: item.person.display_name,
-        total: Parse.currencyStringToNumber(item.original_amount_currency_format),
-        key: item.id || index, // Use a unique field or fallback to the index
-        detail_data: {...item}
-    }));
 
 
     return (
@@ -217,7 +249,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                     Row Count: {inputValue != '' ? filteredDataSource.length: dataSource.length}
                                 </b>
                             </Table.Summary.Cell>
-                            <Table.Summary.Cell index={1} colSpan={2}>
+                            <Table.Summary.Cell index={1} colSpan={3}>
                                 <b style={{color: token.colorPrimary}}>
                                     {
                                        Calculate.grandTotal(inputValue != '' ? filteredDataSource: dataSource)
@@ -228,8 +260,10 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                 {
                                     placement == "sales_invoices" &&
                                         <Button
-                                            onClick={() =>
-                                                ExportToTxt.export(placement, dataSource, {header: true, download: true})}
+                                            onClick={() => {ExportToTxt.export(placement, dataSource, {
+                                                header: true,
+                                                download:true
+                                            })}}
                                             color="primary"
                                             variant="solid">
                                             Export all
@@ -250,7 +284,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                 onOk={() => setIsModalOpen(false)}
                 onCancel={() => setIsModalOpen(false)}
                 style={{padding: '50px 0'}}
-                width={800}
+                width={1000}
                 footer={[
                     <Button
                         style={{position: "sticky"}}

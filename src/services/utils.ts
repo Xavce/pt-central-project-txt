@@ -17,71 +17,31 @@ export class ExportToTxt{
 
 
     static export = (placement: string, dataObject: object[] | object, opt: ExportOptions) => {
-        const config = Parse.exportConfig(placement);
-
         let result = ``;
 
         // Add headers if required
         if (opt.header) {
-            result += `"FK", "KD_JENIS_TRANSAKSI", "FG_PENGGANTI", "NOMOR_FAKTUR", "MASA_PAJAK", "TAHUN_PAJAK", "TANGGAL_FAKTUR", "NPWP", "NAMA_FK", "ALAMAT_LENGKAP", "JUMLAH_DPP", "JUMLAH_PPN", "JUMLAH_PPNBM", "ID_KETERANGAN_TAMBAHAN", "FG_UANG_MUKA", "UANG_MUKA_DPP", "UANG_MUKA_PPN", "UANG_MUKA_PPNBM", "REFERENSI", "LT", "NPWP", "NAMA", "JALAN", "BLOK", "NOMOR", "RT", "RW", "KECAMATAN", "KELURAHAN", "KABUPATEN", "KELURAHAN", "KABUPATEN", "PROPINSI", "KODE_POS", "NOMOR_TELEPON", "OF", "KODE_OBJEK", "NAMA", "HARGA_SATUAN", "JUMLAH_BARANG", "HARGA_TOTAL", "DISKON", "DPP", "PPN", "TARIF_PPNBM", "PPNBM"\n`;
+            result += `"FK", "KD_JENIS_TRANSAKSI", "FG_PENGGANTI", "NOMOR_FAKTUR", "MASA_PAJAK", "TAHUN_PAJAK", "TANGGAL_FAKTUR", "NPWP", "NAMA", "ALAMAT_LENGKAP", "JUMLAH_DPP", "JUMLAH_PPN", "JUMLAH_PPNBM", "ID_KETERANGAN_TAMBAHAN", "FG_UANG_MUKA", "UANG_MUKA_DPP", "UANG_MUKA_PPN", "UANG_MUKA_PPNBM", "REFERENSI", "LT", "NPWP", "NAMA", "JALAN", "BLOK", "NOMOR", "RT", "RW", "KECAMATAN", "KELURAHAN", "KABUPATEN", "KELURAHAN", "KABUPATEN", "PROPINSI", "KODE_POS", "NOMOR_TELEPON", "OF", "KODE_OBJEK", "NAMA", "HARGA_SATUAN", "JUMLAH_BARANG", "HARGA_TOTAL", "DISKON", "DPP", "PPN", "TARIF_PPNBM", "PPNBM"\n`;
         }
 
-        const evaluateFormula = (item: any, formula: string) => {
-            return formula.split('+').map(part => {
-                let cellValue: any = item;
-                const paths = part.trim().split('.');
-                paths.forEach(path => {
-                    try {
-                        cellValue = cellValue[path];
-                    } catch {
-                        cellValue = path; // Fallback if path is invalid
-                    }
-                });
-                return cellValue;
-            }).join(' '); // Combine parts of the formula
-        };
-
         if (Array.isArray(dataObject)) {
+
             dataObject.forEach(item => {
+                const no_faktur = Parse.parseNomorFakturById(item['id'])
+
                 let row = ``;
-                config.forEach((configItem, index) => {
-                    let cellValue: any;
-                    if (configItem.value.includes('+')) {
-                        cellValue = evaluateFormula(item['detail_data'], configItem.value);
-                    } else {
+                const itemDetail = item["detail_data"]
+
+                row += `"${"FK"}", "${"01"}" , "${"0"}", "${no_faktur}", "${"12"}", "${"2024"}", "${itemDetail["transaction_date"]}", "${itemDetail['person']['tax_no']}", "${itemDetail['person']['display_name']}", "${itemDetail["address"]}", "${Number(itemDetail["subtotal"])}", "${Number(itemDetail["tax_amount"])}", "0", "0", "0", "0", "0", "0", "No Invoice: ${itemDetail['transaction_no']}",`;
 
 
-                        cellValue = item['detail_data'];
-                        const paths = configItem.value.split('.');
-                        paths.forEach(path => {
-                            try {
-                                cellValue = cellValue[path];
-                            } catch {
-                                cellValue = path;
-                            }
-                        });
-                    }
-
-                    const quotation = configItem.quotation;
-                    if (quotation === `""`) {
-                        cellValue = `"${cellValue}"`;
-                    }
-
-                    if (index === 0) {
-                        row += cellValue;
-                    } else {
-                        row += `, ${cellValue}`;
-                    }
-                });
-
-                const detailed_data = item['detail_data'];
-
-                if (Array.isArray(detailed_data["transaction_lines_attributes"]) && detailed_data["transaction_lines_attributes"].length >= 0) {
+                if (Array.isArray(itemDetail["transaction_lines_attributes"]) && itemDetail["transaction_lines_attributes"].length >= 0) {
                     console.log("more than 1")
-                    const listProduct = detailed_data["transaction_lines_attributes"]
+                    const listProduct = itemDetail["transaction_lines_attributes"]
 
-                    for (let i = 0; i < detailed_data["transaction_lines_attributes"].length; i++) {
-                        row += `, "OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${listProduct[i]['rate']}", "${listProduct[i]["quantity"]}", "${listProduct[i]['amount']}", "${listProduct[i]['discount']}", "${listProduct[i]['amount']}", ${listProduct[i]['amount'] * (Number(listProduct[i]['line_tax']['rate'] / 100))}, "0", "0"`
+                    for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
+                        row += `\n"OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${Number(listProduct[i]['rate'])}", "${Number(listProduct[i]["quantity"])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['discount'])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['amount']) * (Number(listProduct[i]['line_tax']['rate'] / 100))}", "0", "0",`
+
                     }
                 }
 
@@ -89,55 +49,28 @@ export class ExportToTxt{
                 result += row + `\n`;
             });
         } else {
-            let row = ``;
-            config.forEach((configItem, index) => {
-                if (configItem.header === "OF") {
-                    return; // Break out of the config loop
-                }
+            if (dataObject['detail_data']){
+                let row = ``;
+                const itemDetail = dataObject["detail_data"]
+                const no_faktur = Parse.parseNomorFakturById(dataObject['id'])
 
-                let cellValue: any;
-                if (configItem.value.includes('+')) {
-                    cellValue = evaluateFormula(dataObject, configItem.value);
-                } else {
-                    cellValue = dataObject;
-                    const paths = configItem.value.split('.');
-                    paths.forEach(path => {
-                        try {
-                            cellValue = cellValue[path];
-                        } catch {
-                            cellValue = path;
-                        }
-                    });
-                }
+                const npwp = itemDetail['person']['tax_no'] || ""; // Default to empty string if undefined
+                const parsed_npwp = npwp.replace(/[.\-]/g, "")
 
-                const quotation = configItem.quotation;
-                if (quotation === `""`) {
-                    cellValue = `"${cellValue}"`;
-                }
+                row += `"${"FK"}", "${"01"}" , "${"0"}", "${no_faktur}", "${"12"}", "${"2024"}", "${itemDetail["transaction_date"]}", "${parsed_npwp}", "${itemDetail['person']['display_name']}", "${itemDetail["address"]}", "${Number(itemDetail["subtotal"])}", "${Number(itemDetail["tax_amount"])}", "0", "0", "0", "0", "0", "0", "No Invoice: ${itemDetail['transaction_no']}",`;
 
-                if (index === 0) {
-                    row += cellValue;
-                } else {
-                    row += `, ${cellValue}`;
-                }
-            });
 
-            if (dataObject){
+                if (Array.isArray(itemDetail["transaction_lines_attributes"]) && itemDetail["transaction_lines_attributes"].length >= 0) {
+                    const listProduct = itemDetail["transaction_lines_attributes"]
 
-                if (Array.isArray(dataObject["transaction_lines_attributes"]) && dataObject["transaction_lines_attributes"].length >= 0) {
-                    const listProduct = dataObject["transaction_lines_attributes"]
-
-                    for (let i = 0; i < dataObject["transaction_lines_attributes"].length; i++) {
-                        row += `, "OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${listProduct[i]['rate']}", "${listProduct[i]["quantity"]}", "${listProduct[i]['amount']}", "${listProduct[i]['discount']}", "${listProduct[i]['amount']}", ${listProduct[i]['amount'] * (Number(listProduct[i]['line_tax']['rate'] / 100))}, "0", "0"`
+                    for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
+                        row += `\n"OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${Number(listProduct[i]['rate'])}", "${Number(listProduct[i]["quantity"])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['discount'])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['amount']) * (Number(listProduct[i]['line_tax']['rate'] / 100))}", "0", "0",`
                     }
                 }
+
+                result += row;
+
             }
-
-
-            result += row;
-
-
-
         }
 
         if (opt.download) {
@@ -187,6 +120,11 @@ export class Parse{
             currency: 'IDR',
             minimumFractionDigits: 0, // Rupiah typically doesn't use decimals
         }).format(currencyNumber);
+    }
+
+    static parseNomorFakturById = (id:number) => {
+        const list_nomor_faktur = JSON.parse(localStorage.getItem('list_nomor_faktur'));
+        return list_nomor_faktur[id] || ""
     }
 
     static exportConfig = (placement: string) => {
