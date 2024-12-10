@@ -32,11 +32,13 @@ export class ExportToTxt{
                 let row = ``;
                 const itemDetail = item["detail_data"]
 
-                row += `"${"FK"}", "${"01"}" , "${"0"}", "${no_faktur}", "${"12"}", "${"2024"}", "${itemDetail["transaction_date"]}", "${itemDetail['person']['tax_no']}", "${itemDetail['person']['display_name']}", "${itemDetail["address"]}", "${Number(itemDetail["subtotal"])}", "${Number(itemDetail["tax_amount"])}", "0", "0", "0", "0", "0", "0", "No Invoice: ${itemDetail['transaction_no']}",`;
+                const npwp = itemDetail['person']['tax_no'] || ""; // Default to empty string if undefined
+                const parsed_npwp = npwp.replace(/[.\-]/g, "")
+
+                row += `"${"FK"}", "${"01"}" , "${"0"}", "${no_faktur}", "${"12"}", "${"2024"}", "${itemDetail["transaction_date"]}", "${parsed_npwp}", "${itemDetail['person']['display_name']}", "${itemDetail["address"]}", "${Number(itemDetail["subtotal"])}", "${Number(itemDetail["tax_amount"])}", "0", "0", "0", "0", "0", "0", "No Invoice: ${itemDetail['transaction_no']}",`;
 
 
                 if (Array.isArray(itemDetail["transaction_lines_attributes"]) && itemDetail["transaction_lines_attributes"].length >= 0) {
-                    console.log("more than 1")
                     const listProduct = itemDetail["transaction_lines_attributes"]
 
                     for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
