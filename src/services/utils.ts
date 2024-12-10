@@ -81,7 +81,7 @@ export class ExportToTxt{
                     const listProduct = detailed_data["transaction_lines_attributes"]
 
                     for (let i = 0; i < detailed_data["transaction_lines_attributes"].length; i++) {
-                        row += `, "OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + listProduct[i]['description']}", "${listProduct[i]['rate']}", "${listProduct[i]["quantity"]}", "${listProduct[i]['amount']}", "${listProduct[i]['discount']}", "${listProduct[i]['amount']}", ${listProduct[i]['amount'] * (Number(listProduct[i]['line_tax']['rate'] / 100))}, "0", "0"`
+                        row += `, "OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${listProduct[i]['rate']}", "${listProduct[i]["quantity"]}", "${listProduct[i]['amount']}", "${listProduct[i]['discount']}", "${listProduct[i]['amount']}", ${listProduct[i]['amount'] * (Number(listProduct[i]['line_tax']['rate'] / 100))}, "0", "0"`
                     }
                 }
 
@@ -124,7 +124,7 @@ export class ExportToTxt{
 
             if (dataObject){
 
-                if (Array.isArray(dataObject["transaction_lines_attributes"]) && dataObject["transaction_lines_attributes"].length > 1) {
+                if (Array.isArray(dataObject["transaction_lines_attributes"]) && dataObject["transaction_lines_attributes"].length >= 0) {
                     const listProduct = dataObject["transaction_lines_attributes"]
 
                     for (let i = 0; i < dataObject["transaction_lines_attributes"].length; i++) {
