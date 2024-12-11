@@ -119,7 +119,7 @@ export const TableWithFilter = () => {
                     </div>
                     <div style={{display: 'inline-flex', alignItems: 'center', gap: '15px'}}>
                         <Switch size="default"
-                                defaultValue={true}
+                                value={isSlice7}
                                 onChange={(e) => setIsSlice7(e)}
                                 checkedChildren="Disable Slice 7"
                                 unCheckedChildren="Slice 7"
