@@ -49,7 +49,6 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
             setExportSelectedRow(prevState => prevState.filter(row => row !== rowData));
         }
 
-        console.log(exportSelectedRow)
     };
 
 
