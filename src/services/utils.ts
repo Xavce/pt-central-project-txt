@@ -21,7 +21,7 @@ export class ExportToTxt{
 
         // Add headers if required
         if (opt.header) {
-            result += `"FK", "KD_JENIS_TRANSAKSI", "FG_PENGGANTI", "NOMOR_FAKTUR", "MASA_PAJAK", "TAHUN_PAJAK", "TANGGAL_FAKTUR", "NPWP", "NAMA", "ALAMAT_LENGKAP", "JUMLAH_DPP", "JUMLAH_PPN", "JUMLAH_PPNBM", "ID_KETERANGAN_TAMBAHAN", "FG_UANG_MUKA", "UANG_MUKA_DPP", "UANG_MUKA_PPN", "UANG_MUKA_PPNBM", "REFERENSI", "LT", "NPWP", "NAMA", "JALAN", "BLOK", "NOMOR", "RT", "RW", "KECAMATAN", "KELURAHAN", "KABUPATEN", "KELURAHAN", "KABUPATEN", "PROPINSI", "KODE_POS", "NOMOR_TELEPON", "OF", "KODE_OBJEK", "NAMA", "HARGA_SATUAN", "JUMLAH_BARANG", "HARGA_TOTAL", "DISKON", "DPP", "PPN", "TARIF_PPNBM", "PPNBM"\n`;
+            result += `"FK","KD_JENIS_TRANSAKSI","FG_PENGGANTI","NOMOR_FAKTUR","MASA_PAJAK","TAHUN_PAJAK","TANGGAL_FAKTUR","NPWP","NAMA","ALAMAT_LENGKAP","JUMLAH_DPP","JUMLAH_PPN","JUMLAH_PPNBM","ID_KETERANGAN_TAMBAHAN","FG_UANG_MUKA","UANG_MUKA_DPP","UANG_MUKA_PPN","UANG_MUKA_PPNBM","REFERENSI", \n"LT","NPWP","NAMA","JALAN","BLOK","NOMOR","RT","RW","KECAMATAN","KELURAHAN","KABUPATEN","PROPINSI","KODE_POS","NOMOR_TELEPON", \n"OF","KODE_OBJEK","NAMA","HARGA_SATUAN","JUMLAH_BARANG","HARGA_TOTAL","DISKON","DPP","PPN","TARIF_PPNBM","PPNBM",\n`;
         }
 
         if (Array.isArray(dataObject)) {
@@ -35,14 +35,21 @@ export class ExportToTxt{
                 const npwp = itemDetail['person']['tax_no'] || ""; // Default to empty string if undefined
                 const parsed_npwp = npwp.replace(/[.\-]/g, "")
 
-                row += `"${"FK"}", "${"01"}" , "${"0"}", "${no_faktur}", "${"12"}", "${"2024"}", "${itemDetail["transaction_date"]}", "${parsed_npwp}", "${itemDetail['person']['display_name']}", "${itemDetail["address"]}", "${Number(itemDetail["subtotal"])}", "${Number(itemDetail["tax_amount"])}", "0", "0", "0", "0", "0", "0", "No Invoice: ${itemDetail['transaction_no']}",`;
+
+                row += `"${"FK"}","${"01"}","${"0"}","${no_faktur}","${"12"}","${"2024"}","${itemDetail["transaction_date"]}","${parsed_npwp}","${itemDetail['person']['display_name']}","${itemDetail["address"]}","${Number(itemDetail["subtotal"])}","${Number(itemDetail["tax_amount"])}","0","0","0","0","0","0","No Invoice: ${itemDetail['transaction_no']}",`;
 
 
                 if (Array.isArray(itemDetail["transaction_lines_attributes"]) && itemDetail["transaction_lines_attributes"].length >= 0) {
                     const listProduct = itemDetail["transaction_lines_attributes"]
 
                     for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
-                        row += `\n"OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${Number(listProduct[i]['rate'])}", "${Number(listProduct[i]["quantity"])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['discount'])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['amount']) * (Number(listProduct[i]['line_tax']['rate'] / 100))}", "0", "0",`
+                        let productName = listProduct[i]['product']['name']
+                        if (opt.slice7 == true){
+                            console.log(productName)
+                            productName = productName.slice(7)
+                            console.log(productName)
+                        }
+                        row += `\n"OF","","${productName + " " + listProduct[i]['description']}","${Number(listProduct[i]['rate'])}","${Number(listProduct[i]["quantity"])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['discount'])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['amount']) * ((Number(listProduct[i]['line_tax']['rate']) / 100))}","0","0",`
 
                     }
                 }
@@ -59,14 +66,23 @@ export class ExportToTxt{
                 const npwp = itemDetail['person']['tax_no'] || ""; // Default to empty string if undefined
                 const parsed_npwp = npwp.replace(/[.\-]/g, "")
 
-                row += `"${"FK"}", "${"01"}" , "${"0"}", "${no_faktur}", "${"12"}", "${"2024"}", "${itemDetail["transaction_date"]}", "${parsed_npwp}", "${itemDetail['person']['display_name']}", "${itemDetail["address"]}", "${Number(itemDetail["subtotal"])}", "${Number(itemDetail["tax_amount"])}", "0", "0", "0", "0", "0", "0", "No Invoice: ${itemDetail['transaction_no']}",`;
+                row += `"${"FK"}","${"01"}","${"0"}","${no_faktur}","${"12"}","${"2024"}","${itemDetail["transaction_date"]}","${parsed_npwp}","${itemDetail['person']['display_name']}","${itemDetail["address"]}","${Number(itemDetail["subtotal"])}","${Number(itemDetail["tax_amount"])}","0","0","0","0","0","0","No Invoice: ${itemDetail['transaction_no']}",`;
 
 
                 if (Array.isArray(itemDetail["transaction_lines_attributes"]) && itemDetail["transaction_lines_attributes"].length >= 0) {
                     const listProduct = itemDetail["transaction_lines_attributes"]
 
+
+
                     for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
-                        row += `\n"OF", "${listProduct[i]['product']['id']}", "${listProduct[i]['product']['name'] + " " + listProduct[i]['description']}", "${Number(listProduct[i]['rate'])}", "${Number(listProduct[i]["quantity"])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['discount'])}", "${Number(listProduct[i]['amount'])}", "${Number(listProduct[i]['amount']) * (Number(listProduct[i]['line_tax']['rate'] / 100))}", "0", "0",`
+
+                        let productName = listProduct[i]['product']['name']
+                        if (opt.slice7 == true){
+                            console.log(productName)
+                            productName = productName.slice(7)
+                            console.log(productName)
+                        }
+                        row += `\n"OF","","${productName + " " + listProduct[i]['description']}","${Number(listProduct[i]['rate'])}","${Number(listProduct[i]["quantity"])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['discount'])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['amount']) * ((Number(listProduct[i]['line_tax']['rate']) / 100))}","0","0",`
                     }
                 }
 
