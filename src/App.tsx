@@ -1,6 +1,7 @@
 import './App.css'
 import {TableWithFilter} from "./components/tableWithFilter.tsx";
 import {ConfigProvider, Space, theme} from 'antd';
+import logo from '../public/logo.svg'
 // import {Customer, Invoice} from "./services/api/jurnal-api.ts";
 
 function App() {
@@ -33,7 +34,10 @@ function App() {
                 style={{display: "block"}}>
                 <>
                     <div className="card">
-                        <h1 style={{textAlign:"center"}}> PT.Central </h1>
+                        <div className={'title'}>
+                            <img src={logo} style={{width: '100px', height: '100px'}}/>
+                            <h1 style={{textAlign: "center"}}> PT. Central Alam Resource Lestari </h1>
+                        </div>
                         <TableWithFilter/>
                     </div>
 
