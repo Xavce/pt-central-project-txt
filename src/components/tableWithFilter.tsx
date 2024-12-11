@@ -50,6 +50,7 @@ export const TableWithFilter = () => {
                         setPageLength(res.total_count)
 
                         const result:DataType[] = (Parse.jsonPath(res ,placementPaths.sales_invoices) as any[]).map<DataType>((item, index) => ({
+                            date: item.transaction_date,
                             id: item.transaction_no,
                             name: item.person.display_name,
                             total: Parse.currencyStringToNumber(item.original_amount_currency_format),
@@ -69,6 +70,7 @@ export const TableWithFilter = () => {
                 Customer.getCustomerInvoices({start_date: dateRange[0], end_date: dateRange[1]})
                     .then((res) => {
                         const result:DataType[] = (Parse.jsonPath(res ,placementPaths.sales_by_customers) as any[]).map<DataType>((item, index) => ({
+                            date: item.transaction_date,
                             id: item.customer.id,
                             name: item.customer.name,
                             total: Parse.currencyStringToNumber(item.customer.subtotal),
@@ -121,8 +123,8 @@ export const TableWithFilter = () => {
                         <Switch size="default"
                                 value={isSlice7}
                                 onChange={(e) => setIsSlice7(e)}
-                                checkedChildren="Disable Slice 7"
-                                unCheckedChildren="Slice 7"
+                                checkedChildren="Non Lab"
+                                unCheckedChildren="Lab"
                                 defaultChecked />
                     </div>
                 </div>
