@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Input, Table} from 'antd';
-import type { TableColumnsType } from 'antd';
+import type { TableColumnsType, TableProps } from 'antd';
 import { Button, Modal, theme, Popover } from 'antd';
 import downloadFileIcon from '../assets/download-file.svg'
 import eyeIcon from '../assets/eye.svg'
@@ -12,6 +12,8 @@ import {DataType} from "../types";
 
 
 const {useToken} = theme
+
+type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
 interface InputComponentProps {
     isLoading: boolean;
@@ -35,7 +37,22 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
     const [selectedRowData, setSelectedRowData] = useState({});
     const [detailedRowData, setDetailedRowData] = useState({})
 
+    const [exportSelectedRow, setExportSelectedRow] = useState<object[]>([])
+
     let columns: TableColumnsType<DataType> = [];
+
+
+    const rowSelection: TableRowSelection<DataType> = {
+        onSelect: (record, selected, selectedRows) => {
+            setExportSelectedRow(selectedRows)
+        },
+        onSelectAll: (selected, selectedRows, changeRows) => {
+            setExportSelectedRow(selectedRows)
+        },
+    };
+
+
+
 
     const updateFakturNumToLocal = (id, nomor_faktur) => {
         let list_nomor_faktur = JSON.parse(localStorage.getItem("list_nomor_faktur")) || {};
@@ -55,6 +72,15 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
     switch (placement){
         case 'sales_invoices':
             columns = [
+                {
+                    title: ' Transaction Date',
+                    width: 50,
+                    dataIndex: 'date',
+                    key: 'date',
+                    fixed: 'left',
+                    sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+                    sortDirections: ["ascend",'descend'],
+                },
                 {
                     title: 'Display Name',
                     width: 50,
@@ -99,7 +125,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                     title: 'Action',
                     key: 'operation',
                     fixed: 'right',
-                    width: 20,
+                    width: 30,
                     render: (_,record) =>
                         <div style={{ display: 'flex', gap: '10px', justifyContent:'right' }}>
                             <Popover
@@ -195,6 +221,15 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
         }
     };
 
+    const handleExportAll = () => {
+        if (exportSelectedRow.length != 0) {
+            ExportToTxt.export(placement, exportSelectedRow, {
+                slice7:isSlice7,
+                header: true,
+                download:true
+            })
+        }
+    }
 
     useEffect(() => {
         handleInputChange(inputValue);
@@ -221,6 +256,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
     return (
         <>
             <Table<DataType>
+                rowSelection={rowSelection}
                 loading={isLoading}
                 columns={columns}
                 pagination={{
@@ -238,27 +274,28 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                 summary={() => (
                     <Table.Summary fixed="bottom">
                         <Table.Summary.Row>
-                            <Table.Summary.Cell index={0} >
+                            <Table.Summary.Cell index={0} colSpan={1}>
+                                <b style={{color: token.colorPrimary}}>
+                                    Selected: {exportSelectedRow.length}
+                                </b>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={1} colSpan={2}>
                                 <b style={{color: token.colorPrimary}}>
                                     Row Count: {inputValue != '' ? filteredDataSource.length: dataSource.length}
                                 </b>
                             </Table.Summary.Cell>
-                            <Table.Summary.Cell index={1} colSpan={3}>
+                            <Table.Summary.Cell index={3} colSpan={3}>
                                 <b style={{color: token.colorPrimary}}>
                                     {
                                        Calculate.grandTotal(inputValue != '' ? filteredDataSource: dataSource)
                                     }
                                 </b>
                             </Table.Summary.Cell>
-                            <Table.Summary.Cell index={3} align={'right'}>
+                            <Table.Summary.Cell index={6} align={'right'}>
                                 {
                                     placement == "sales_invoices" &&
                                         <Button
-                                            onClick={() => {ExportToTxt.export(placement, dataSource, {
-                                                slice7:isSlice7,
-                                                header: true,
-                                                download:true
-                                            })}}
+                                            onClick={handleExportAll}
                                             color="primary"
                                             variant="solid">
                                             Export all
