@@ -31,6 +31,7 @@ export type ExportOptions = {
 }
 
 export type DataType = {
+    date: string
     id: number;
     name: string;
     total: number;
