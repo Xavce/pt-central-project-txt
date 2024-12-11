@@ -72,8 +72,6 @@ export class ExportToTxt{
                 if (Array.isArray(itemDetail["transaction_lines_attributes"]) && itemDetail["transaction_lines_attributes"].length >= 0) {
                     const listProduct = itemDetail["transaction_lines_attributes"]
 
-
-
                     for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
 
                         let productName = listProduct[i]['product']['name']
