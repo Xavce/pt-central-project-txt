@@ -26,7 +26,6 @@ export type ExportConfig = {
 
 export type ExportOptions = {
     slice7: boolean
-    ppn_rate?: number
     header: boolean
     download: boolean //only return object
 }
