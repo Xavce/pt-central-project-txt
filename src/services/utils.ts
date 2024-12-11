@@ -45,9 +45,7 @@ export class ExportToTxt{
                     for (let i = 0; i < itemDetail["transaction_lines_attributes"].length; i++) {
                         let productName = listProduct[i]['product']['name']
                         if (opt.slice7 == true){
-                            console.log(productName)
                             productName = productName.slice(7)
-                            console.log(productName)
                         }
                         row += `\n"OF","","${productName + " " + listProduct[i]['description']}","${Number(listProduct[i]['rate'])}","${Number(listProduct[i]["quantity"])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['discount'])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['amount']) * ((Number(listProduct[i]['line_tax']['rate']) / 100))}","0","0",`
 
@@ -76,9 +74,7 @@ export class ExportToTxt{
 
                         let productName = listProduct[i]['product']['name']
                         if (opt.slice7 == true){
-                            console.log(productName)
                             productName = productName.slice(7)
-                            console.log(productName)
                         }
                         row += `\n"OF","","${productName + " " + listProduct[i]['description']}","${Number(listProduct[i]['rate'])}","${Number(listProduct[i]["quantity"])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['discount'])}","${Number(listProduct[i]['amount'])}","${Number(listProduct[i]['amount']) * ((Number(listProduct[i]['line_tax']['rate']) / 100))}","0","0",`
                     }
