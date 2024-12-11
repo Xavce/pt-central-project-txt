@@ -86,23 +86,14 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                     key:'no_faktur',
                     width:50,
                     render: (_, record) =>
-                        <Popover
-                            title={
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
-                                    <span>Export to TXT</span>
-                                </div>
-                            }
-                            trigger="hover" placement="bottomRight">
-                            <Input
-                                placeholder="Nomor Faktur"
-                                defaultValue={getFakturNumFromLocal(_['id'])}
-                                onChange={(e) => {
-                                    const newValue = e.target.value;
-                                    updateFakturNumToLocal(_['id'], newValue);
-                                }}
-                            />
-                        </Popover>
+                        <Input
+                            placeholder="Nomor Faktur"
+                            defaultValue={getFakturNumFromLocal(_['id'])}
+                            onChange={(e) => {
+                                const newValue = e.target.value;
+                                updateFakturNumToLocal(_['id'], newValue);
+                            }}
+                        />
                 },
                 {
                     title: 'Action',
@@ -124,10 +115,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                                     color="primary"
                                     variant="outlined"
                                     icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
-                                    onClick={() => {
-                                        setSelectedRowData(_)
-                                        setIsModalOpen(true)
-                                    }}
+                                    onClick={() => handlePreviewClick(_)}
                                 />
                             </Popover>
                             <Popover
@@ -212,15 +200,18 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
         handleInputChange(inputValue);
     }, [inputValue]);
 
-    useEffect(() => {
-        const exportedText = ExportToTxt.export(placement, selectedRowData, {
+    const handlePreviewClick = (rowData: object) => {
+        setSelectedRowData(rowData)
+
+        const exportedText = ExportToTxt.export(placement, rowData, {
             slice7:isSlice7,
             header: true,
             download: false
         });
 
         setDetailedRowData(exportedText)
-    }, [selectedRowData]);
+        setIsModalOpen(true)
+    }
 
     useEffect(() => {
         setInputValue('')
