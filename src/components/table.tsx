@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Input, Table} from 'antd';
-import type { TableColumnsType, TableProps } from 'antd';
-import { Button, Modal, theme, Popover } from 'antd';
+import type { TableColumnsType } from 'antd';
+import { Button, Modal, theme, Popover, Checkbox } from 'antd';
 import downloadFileIcon from '../assets/download-file.svg'
 import eyeIcon from '../assets/eye.svg'
 import infoIcon from '../assets/information.svg'
@@ -13,7 +13,6 @@ import {DataType} from "../types";
 
 const {useToken} = theme
 
-type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
 
 interface InputComponentProps {
     isLoading: boolean;
@@ -41,17 +40,17 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
 
     let columns: TableColumnsType<DataType> = [];
 
+    const handleExportRowUpdate = (rowData: object, value: boolean) => {
+        if (value) {
+            // Add the row to the array if it's not already present
+            setExportSelectedRow(prevState => [...prevState, rowData]);
+        } else {
+            // Remove the row from the array by filtering it out
+            setExportSelectedRow(prevState => prevState.filter(row => row !== rowData));
+        }
 
-    const rowSelection: TableRowSelection<DataType> = {
-        onSelect: (record, selected, selectedRows) => {
-            setExportSelectedRow(selectedRows)
-        },
-        onSelectAll: (selected, selectedRows, changeRows) => {
-            setExportSelectedRow(selectedRows)
-        },
+        console.log(exportSelectedRow)
     };
-
-
 
 
     const updateFakturNumToLocal = (id, nomor_faktur) => {
@@ -128,6 +127,10 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                     width: 30,
                     render: (_,record) =>
                         <div style={{ display: 'flex', gap: '10px', justifyContent:'right' }}>
+                            <Checkbox
+                                style={{transform: 'scale(2)', marginRight: '10px'}}
+                                onChange={(e) => handleExportRowUpdate(_, e.target.checked)}
+                            />
                             <Popover
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -256,7 +259,6 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
     return (
         <>
             <Table<DataType>
-                rowSelection={rowSelection}
                 loading={isLoading}
                 columns={columns}
                 pagination={{
@@ -274,12 +276,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                 summary={() => (
                     <Table.Summary fixed="bottom">
                         <Table.Summary.Row>
-                            <Table.Summary.Cell index={0} colSpan={1}>
-                                <b style={{color: token.colorPrimary}}>
-                                    Selected: {exportSelectedRow.length}
-                                </b>
-                            </Table.Summary.Cell>
-                            <Table.Summary.Cell index={1} colSpan={2}>
+                            <Table.Summary.Cell index={0} colSpan={2}>
                                 <b style={{color: token.colorPrimary}}>
                                     Row Count: {inputValue != '' ? filteredDataSource.length: dataSource.length}
                                 </b>
@@ -294,12 +291,12 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                             <Table.Summary.Cell index={6} align={'right'}>
                                 {
                                     placement == "sales_invoices" &&
-                                        <Button
-                                            onClick={handleExportAll}
-                                            color="primary"
-                                            variant="solid">
-                                            Export all
-                                        </Button>
+                                    <Button
+                                        onClick={handleExportAll}
+                                        color="primary"
+                                        variant="solid">
+                                        Export all {exportSelectedRow.length}
+                                    </Button>
                                 }
 
                             </Table.Summary.Cell>
