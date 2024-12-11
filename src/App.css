@@ -17,6 +17,20 @@
   filter: invert(100%);
 }
 
+.title {
+  display: flex;
+  margin: 0 0 30px;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.title img {
+  -webkit-filter: invert(0%); /* Safari/Chrome */
+  filter: invert(0%);
+}
+
 img{
   -webkit-filter: invert(100%); /* Safari/Chrome */
   filter: invert(100%);
