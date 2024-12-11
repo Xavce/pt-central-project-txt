@@ -25,9 +25,10 @@ interface InputComponentProps {
     pageLength: number
     placement: string
     option: string
+    isSlice7: boolean
 }
 
-export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, option, placement, pageLength, dataSource, inputValue, isLoading, setIsLoading, setPageSize, pageSize, setPage }) => {
+export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInputValue, option, placement, pageLength, dataSource, inputValue, isLoading, setIsLoading, setPageSize, pageSize, setPage }) => {
     const { token } = useToken();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filteredDataSource, setFilteredDataSource] = useState([]);
@@ -145,6 +146,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                     variant="solid"
                                     icon={<img src={downloadFileIcon} alt="Download Icon" style={{ width: 16, height: 16 }} />}
                                     onClick={() => {ExportToTxt.export(placement, _, {
+                                        slice7: isSlice7,
                                         header: true,
                                         download: true})}}
                                 />
@@ -212,6 +214,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
 
     useEffect(() => {
         const exportedText = ExportToTxt.export(placement, selectedRowData, {
+            slice7:isSlice7,
             header: true,
             download: false
         });
@@ -261,6 +264,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                                     placement == "sales_invoices" &&
                                         <Button
                                             onClick={() => {ExportToTxt.export(placement, dataSource, {
+                                                slice7:isSlice7,
                                                 header: true,
                                                 download:true
                                             })}}
@@ -278,7 +282,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({setInputValue, o
                 sticky={{offsetHeader: 64}}
             />
             <Modal
-                title="Vertically centered modal dialog"
+                title="Preview"
                 centered
                 open={isModalOpen}
                 onOk={() => setIsModalOpen(false)}

@@ -3,10 +3,11 @@ import {InputComponent} from "./input.tsx";
 import {TableComponent} from "./table.tsx";
 import {SelectRadioComponent, SelectOptionGroupComponent} from "./select.tsx";
 import {useEffect, useState} from "react";
-import {ConfigComponent} from "./config.tsx";
 import {Invoice, Customer} from "../services/api/jurnal-api.ts";
 import {Calculate, Parse} from "../services/utils.ts";
 import {DataType} from "../types";
+import { Switch, InputNumber } from 'antd';
+
 
 const date = Calculate.date(1)
 
@@ -37,6 +38,7 @@ export const TableWithFilter = () => {
         "sales_by_customers": 'sales_by_customers.report',
     }
 
+    const [isSlice7, setIsSlice7] = useState<boolean>(false)
 
     useEffect(() => {
         setIsLoading(true)
@@ -94,7 +96,6 @@ export const TableWithFilter = () => {
     const [option, setOption] = useState<string>('')
     const [inputValue, setInputValue] = useState<string>('');
 
-
     return (
         <>
             <div>
@@ -116,13 +117,17 @@ export const TableWithFilter = () => {
                             option={option}
                             isLoading={isLoading}/>
                     </div>
-                    <div>
-                        <ConfigComponent
-                            placement={placement}
-                        />
+                    <div style={{display: 'inline-flex', alignItems: 'center', gap: '15px'}}>
+                        <Switch size="default"
+                                defaultValue={true}
+                                onChange={(e) => setIsSlice7(e)}
+                                checkedChildren="Disable Slice 7"
+                                unCheckedChildren="Slice 7"
+                                defaultChecked />
                     </div>
                 </div>
                 <TableComponent
+                    isSlice7={isSlice7}
                     setInputValue={setInputValue}
                     option={option}
                     placement={placement}
