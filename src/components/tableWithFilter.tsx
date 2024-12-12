@@ -123,18 +123,20 @@ export const TableWithFilter = () => {
                         <Switch size="default"
                                 value={isSlice7}
                                 onChange={(e) => setIsSlice7(e)}
-                                checkedChildren="Non Lab"
-                                unCheckedChildren="Lab"
+                                checkedChildren="Lab"
+                                unCheckedChildren="Non Lab"
                                 defaultChecked />
                     </div>
                 </div>
                 <TableComponent
+                    dateRange={dateRange}
                     isSlice7={isSlice7}
                     setInputValue={setInputValue}
                     option={option}
                     placement={placement}
                     pageLength={pageLength}
                     setPage={setPage}
+                    page={page}
                     pageSize={pageSize}
                     setPageSize={setPageSize}
                     dataSource={dataSource}

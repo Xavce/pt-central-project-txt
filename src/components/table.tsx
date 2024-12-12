@@ -27,9 +27,11 @@ interface InputComponentProps {
     placement: string
     option: string
     isSlice7: boolean
+    dateRange: string[]
+    page: number
 }
 
-export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInputValue, option, placement, pageLength, dataSource, inputValue, isLoading, setIsLoading, setPageSize, pageSize, setPage }) => {
+export const TableComponent : React.FC<InputComponentProps> = ({page, dateRange, isSlice7, setInputValue, option, placement, pageLength, dataSource, inputValue, isLoading, setIsLoading, setPageSize, pageSize, setPage }) => {
     const { token } = useToken();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filteredDataSource, setFilteredDataSource] = useState([]);
@@ -130,7 +132,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                                 style={{transform: 'scale(2)', marginRight: '10px'}}
                                 onChange={(e) => handleExportRowUpdate(_, e.target.checked)}
                             />
-                            <Popover
+                            {/* <Popover
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <img src={infoIcon} alt="Info" style={{ width: '16px', height: '16px' }} />
@@ -145,7 +147,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                                     icon={<img src={eyeIcon} alt="Preview Icon" style={{ width: 16, height: 16 }} />}
                                     onClick={() => handlePreviewClick(_)}
                                 />
-                            </Popover>
+                            </Popover> */}
                             <Popover
                                 title={
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -254,6 +256,10 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
         setInputValue('')
     }, [option, placement])
 
+    useEffect(() => {
+        setExportSelectedRow([])
+    }, [dateRange, page, pageSize])
+
 
     return (
         <>
@@ -294,7 +300,7 @@ export const TableComponent : React.FC<InputComponentProps> = ({isSlice7, setInp
                                         onClick={handleExportAll}
                                         color="primary"
                                         variant="solid">
-                                        Export all {exportSelectedRow.length}
+                                        Export all
                                     </Button>
                                 }
 

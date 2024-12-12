@@ -24,8 +24,8 @@ function App() {
         <ConfigProvider
             theme={{
                 "token": {
-                    "colorPrimary": "#8800ff",
-                    "colorInfo": "#8800ff"
+                    "colorPrimary": "#f76060",
+                    "colorInfo": "#f76060"
                 },
                 algorithm: theme.darkAlgorithm,
             }}
