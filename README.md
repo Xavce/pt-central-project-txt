@@ -21,6 +21,7 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan aplikasi:
 ---
 
 ## 🔍 Fitur Utama
+Note: Beberapa fitur di lock!
 
 ### 1. **Date**
 Digunakan untuk memilih rentang waktu data yang akan diambil.  
